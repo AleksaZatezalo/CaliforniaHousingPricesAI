@@ -5,6 +5,7 @@ Description: A script used to partition test data.
 """
 
 import numpy as np
+import downloader
 
 def split_train_test(data, test_ratio):
     """
@@ -13,9 +14,12 @@ def split_train_test(data, test_ratio):
     the data into a training and testing partition.
     """
 
-    shuffled_indicies = np.random.permutation(len(data))
+    shuffled_indices = np.random.permutation(len(data))
     test_set_size = int(len(data) * test_ratio)
-    test_indicies = shuffled_indicies[:test_set_size]
-    train_indices = shuffled_indicies[test_indicies:]
-    return data.iloc[train_indices], data.iloc[train_indices]
+    test_indices = shuffled_indices[:test_set_size]
+    train_indices = shuffled_indices[test_set_size:]
+    return data.iloc[train_indices], data.iloc[test_indices]
+
+housing = downloader.loading_housing_data()
+train_set, test_set = split_train_test(housing, 0.2)
 
