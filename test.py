@@ -6,6 +6,7 @@ Description: A script used to partition test data.
 
 import numpy as np
 import downloader
+from sklearn.impute import SimpleImputer
 
 def split_train_test(data, test_ratio):
     """
@@ -35,3 +36,13 @@ corr_matrix["median_house_value"].sort_values(ascending=False)
 housing = train_set.drop("median_house_value", axis=1)
 housing_labels = train_set["median_house_value"].copy()
 housing.dropna(subset=["total_bedrooms"])
+
+imputer = SimpleImputer(strategy = "median")
+housing_num = housing.drop("ocean_proximity", axis=1)
+imputer.fit(housing_num)
+X = imputer.transform(housing_num)
+housing_tr = downloader.pd.DataFrame(X, columns=housing_num.columns, index = housing_num.index)
+print(housing_tr)
+
+housing_cat = housing[["ocean_proximity"]]
+print(housing_cat.head(10))
