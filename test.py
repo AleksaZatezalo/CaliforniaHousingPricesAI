@@ -6,7 +6,12 @@ Description: A script used to partition test data.
 
 import numpy as np
 import downloader
+import CombinedAttributesAdder
 from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.compose import ColumnTransformer
 
 def split_train_test(data, test_ratio):
     """
@@ -42,7 +47,13 @@ housing_num = housing.drop("ocean_proximity", axis=1)
 imputer.fit(housing_num)
 X = imputer.transform(housing_num)
 housing_tr = downloader.pd.DataFrame(X, columns=housing_num.columns, index = housing_num.index)
-print(housing_tr)
 
+# Assigning Values to Ocean Proximity
 housing_cat = housing[["ocean_proximity"]]
-print(housing_cat.head(10))
+ordinal_encoder = OrdinalEncoder()
+housing_cat_encoded = ordinal_encoder.fit_transform(housing_cat)
+housing_cat_encoded[:10]
+
+
+num_pipeline = Pipeline([('imputer', SimpleImputer(strategy="median")), ('attribs_adder', CombinedAttributesAdder.CombinedAttributesAdder(), ('std_scaler', StandardScaler())),])
+housing_num_tr = num_pipeline.fit_transform(housing_num)
