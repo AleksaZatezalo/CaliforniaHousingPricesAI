@@ -12,6 +12,8 @@ from sklearn.preprocessing import OrdinalEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.linear_model import LinearRegression
 
 def split_train_test(data, test_ratio):
     """
@@ -56,4 +58,13 @@ housing_cat_encoded[:10]
 
 
 num_pipeline = Pipeline([('imputer', SimpleImputer(strategy="median")), ('attribs_adder', CombinedAttributesAdder.CombinedAttributesAdder(), ('std_scaler', StandardScaler())),])
-housing_num_tr = num_pipeline.fit_transform(housing_num)
+#housing_num_tr = num_pipeline.fit_transform(housing_num)
+
+num_attribs = list(housing_num)
+cat_attribs = ["ocean_proximity"]
+
+full_pipeline = ColumnTransformer([("num", num_pipeline, num_attribs), ("cat", OneHotEncoder(), cat_attribs),])
+housing_prepared = full_pipeline.fit_transform(housing)
+
+lin_reg = LinearRegression()
+lin_reg.fit(housing_prepared, housing_labels)
